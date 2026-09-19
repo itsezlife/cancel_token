@@ -7,7 +7,7 @@ import 'cancelled_exception/cancelled_exception_test.dart'
 
 /// Aggregate entrypoint for the unit suite.
 void main() => group('Unit', () {
-  cancel_token_test.main();
-  cancelable_scope_test.main();
-  cancelled_exception_test.main();
-});
+      cancel_token_test.main();
+      cancelable_scope_test.main();
+      cancelled_exception_test.main();
+    });

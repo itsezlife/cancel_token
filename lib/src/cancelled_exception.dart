@@ -8,7 +8,7 @@ final class CancelledException implements Exception {
 
   @override
   String toString() => switch (reason) {
-    null => 'CancelledException',
-    final value => 'CancelledException: $value',
-  };
+        null => 'CancelledException',
+        final value => 'CancelledException: $value',
+      };
 }

@@ -1,0 +1,6 @@
+# Standalone options so example does not inherit the root package:lints include.
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
