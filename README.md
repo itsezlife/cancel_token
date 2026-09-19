@@ -47,12 +47,12 @@ See [`example/bin/cancel_token_example.dart`](example/bin/cancel_token_example.d
 
 ```yaml
 dependencies:
-  cancel_token: ^0.1.0
+  cancel_token: ^0.1.1
 ```
 
 ## Coverage
 
-[![](https://codecov.io/gh/itsezlife/cancelable/branch/main/graphs/sunburst.svg)](https://codecov.io/gh/itsezlife/cancelable/branch/main)
+[![](https://codecov.io/gh/itsezlife/cancel_token/branch/main/graphs/sunburst.svg)](https://codecov.io/gh/itsezlife/cancel_token/branch/main)
 
 ## Changelog
 

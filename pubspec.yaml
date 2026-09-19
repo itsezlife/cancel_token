@@ -1,11 +1,11 @@
 name: cancel_token
 description: >-
   Cancel Dart Futures and share a CancelToken across requests.
-version: 0.1.0
+version: 0.1.1
 
-homepage: https://github.com/itsezlife/cancelable
-repository: https://github.com/itsezlife/cancelable
-issue_tracker: https://github.com/itsezlife/cancelable/issues
+homepage: https://github.com/itsezlife/cancel_token
+repository: https://github.com/itsezlife/cancel_token
+issue_tracker: https://github.com/itsezlife/cancel_token/issues
 
 environment:
   sdk: ">=3.4.0 <4.0.0"
