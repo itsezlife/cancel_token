@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:cancelable/cancelable.dart';
+import 'package:cancel_token/cancel_token.dart';
 
 /// Minimal repro: dispose a [CancelableScope] while work is still in flight.
 ///

@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:async/async.dart';
-import 'package:cancelable/src/cancelable.dart';
-import 'package:cancelable/src/cancelled_exception.dart';
+import 'package:cancel_token/src/cancelable.dart';
+import 'package:cancel_token/src/cancelled_exception.dart';
 import 'package:meta/meta.dart';
 
 /// A cancel signal for in-flight work.

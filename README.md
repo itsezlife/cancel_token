@@ -1,6 +1,7 @@
-# cancelable
+# cancel_token
 
 [![Dart](https://img.shields.io/badge/Dart-%230175C2.svg?style=flat&logo=dart&logoColor=white)](https://dart.dev)
+[![pub package](https://img.shields.io/pub/v/cancel_token.svg)](https://pub.dev/packages/cancel_token)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Cancel Dart Futures and share a `CancelToken` across requests.
@@ -40,13 +41,13 @@ Runnable console demo:
 cd example && dart pub get && dart run
 ```
 
-See [`example/bin/cancelable_example.dart`](example/bin/cancelable_example.dart).
+See [`example/bin/cancel_token_example.dart`](example/bin/cancel_token_example.dart).
 
 ## Install
 
 ```yaml
 dependencies:
-  cancelable: latest
+  cancel_token: ^0.1.0
 ```
 
 ## Coverage

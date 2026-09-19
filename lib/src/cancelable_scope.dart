@@ -1,7 +1,7 @@
 import 'package:async/async.dart';
-import 'package:cancelable/src/cancel_token.dart';
-import 'package:cancelable/src/cancelable.dart';
-import 'package:cancelable/src/cancelled_exception.dart';
+import 'package:cancel_token/src/cancel_token.dart';
+import 'package:cancel_token/src/cancelable.dart';
+import 'package:cancel_token/src/cancelled_exception.dart';
 
 /// Owns [CancelToken]s for a host lifetime (screen, session, scope).
 ///

@@ -1,10 +1,10 @@
-name: cancelable_example
-description: Minimal console demo for package:cancelable.
+name: cancel_token_example
+description: Minimal console demo for package:cancel_token.
 publish_to: none
 
 environment:
   sdk: ">=3.4.0 <4.0.0"
 
 dependencies:
-  cancelable:
+  cancel_token:
     path: ../

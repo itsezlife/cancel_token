@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:cancelable/cancelable.dart';
+import 'package:cancel_token/cancel_token.dart';
 import 'package:test/test.dart';
 
 void main() {

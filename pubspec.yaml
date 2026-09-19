@@ -1,4 +1,4 @@
-name: cancelable
+name: cancel_token
 description: >-
   Cancel Dart Futures and share a CancelToken across requests.
 version: 0.1.0
