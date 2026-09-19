@@ -1,8 +1,7 @@
-/// Unified Future + CancelToken cancellation for Dart.
+/// Cooperative cancellation for Dart Futures and HTTP-style cancel signals.
 library;
 
 export 'src/cancel_token.dart';
-export 'src/cancellable.dart';
-export 'src/cancellable_scope.dart';
-export 'src/cancellable_token.dart';
-export 'src/exceptions.dart';
+export 'src/cancelable.dart';
+export 'src/cancelable_scope.dart';
+export 'src/cancelled_exception.dart';

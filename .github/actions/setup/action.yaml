@@ -1,0 +1,61 @@
+name: "Setup Dart Environment"
+description: Installs the Dart SDK, verifies package version, and runs pub get.
+
+inputs:
+  sdk:
+    description: "Dart SDK version or channel (e.g. stable, 3.11)"
+    required: false
+    default: stable
+  pub-cache:
+    description: "Cache key segment for the pub cache"
+    required: false
+    default: packages
+
+outputs:
+  version:
+    description: "The version of the package from pubspec.yaml"
+    value: ${{ steps.versions.outputs.version }}
+  dart-version:
+    description: "Resolved Dart SDK version"
+    value: ${{ steps.setup-dart.outputs.dart-version }}
+
+runs:
+  using: composite
+  steps:
+    - name: 🎯 Setup Dart SDK
+      id: setup-dart
+      uses: dart-lang/setup-dart@v1
+      with:
+        sdk: ${{ inputs.sdk }}
+
+    - name: 👀 Verify versions
+      id: versions
+      shell: bash
+      run: |
+        test -f pubspec.yaml && test -f CHANGELOG.md
+        version_pubspec=$(grep '^version:' pubspec.yaml | awk '{print $2}' | sed 's/[^[:print:]]//g')
+        echo "Version from pubspec.yaml: '$version_pubspec'"
+        grep -q "# $version_pubspec" CHANGELOG.md || (echo "Version not found in CHANGELOG.md" >&2; exit 1)
+        echo "VERSION=$version_pubspec" >> "$GITHUB_ENV"
+        echo "version=$version_pubspec" >> "$GITHUB_OUTPUT"
+
+    - name: 📤 Restore Pub modules
+      id: cache-pub-restore
+      uses: actions/cache/restore@v4
+      with:
+        path: |
+          ~/.pub-cache
+        key: ${{ runner.os }}-pub-${{ inputs.pub-cache }}-${{ steps.setup-dart.outputs.dart-version }}-${{ hashFiles('pubspec.yaml', 'example/pubspec.yaml') }}
+
+    - name: 👷 Install Dependencies
+      shell: bash
+      run: dart pub get
+
+    - name: 📥 Save Pub modules
+      id: cache-pub-save
+      if: steps.cache-pub-restore.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        path: |
+          ~/.pub-cache
+        key: ${{ steps.cache-pub-restore.outputs.cache-primary-key }}

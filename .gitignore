@@ -4,10 +4,10 @@
 pubspec.lock
 build/
 doc/api/
+coverage/
 
 # IDE
 .idea/
-.vscode/
 *.iml
 
 # OS

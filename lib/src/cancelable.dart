@@ -1,5 +1,5 @@
 /// Something that can be cooperatively cancelled.
-abstract interface class Cancellable {
+abstract interface class Cancelable {
   /// Cancels this resource with an optional [reason].
   void cancel([Object? reason]);
 

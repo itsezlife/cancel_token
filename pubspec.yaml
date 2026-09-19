@@ -1,21 +1,19 @@
 name: cancelable
 description: >-
-  Unified cancellation for Dart Futures (CancelableOperation) and a
-  transport-agnostic CancelToken.
-version: 0.1.0+1
-publish_to: none
+  Cancel Dart Futures and share a CancelToken across requests.
+version: 0.1.0
 
 homepage: https://github.com/itsezlife/cancelable
 repository: https://github.com/itsezlife/cancelable
 issue_tracker: https://github.com/itsezlife/cancelable/issues
 
 environment:
-  sdk: ">=3.11.0 <4.0.0"
+  sdk: ">=3.4.0 <4.0.0"
 
 dependencies:
-  async: ^2.13.0
-  meta: ^1.16.0
+  async: ^2.12.0
+  meta: ^1.12.0
 
 dev_dependencies:
-  lints: ^6.0.0
+  lints: ^4.0.0
   test: ^1.25.0

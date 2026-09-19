@@ -1,0 +1,120 @@
+name: Checkout
+
+on:
+  workflow_dispatch:
+    inputs:
+      dart-sdk:
+        description: "Dart SDK version or channel"
+        default: "stable"
+        required: false
+  push:
+    branches:
+      - "main"
+      - "master"
+    paths:
+      - ".github/**.yaml"
+      - ".github/**.yml"
+      - "lib/**.dart"
+      - "test/**.dart"
+      - "example/**.dart"
+      - "example/pubspec.yaml"
+      - "pubspec.yaml"
+      - "analysis_options.yaml"
+  pull_request:
+    branches:
+      - "main"
+      - "master"
+      - "dev"
+      - "develop"
+      - "feature/**"
+      - "bugfix/**"
+      - "hotfix/**"
+      - "support/**"
+    paths:
+      - ".github/**.yaml"
+      - ".github/**.yml"
+      - "lib/**.dart"
+      - "test/**.dart"
+      - "example/**.dart"
+      - "example/pubspec.yaml"
+      - "pubspec.yaml"
+      - "analysis_options.yaml"
+
+permissions:
+  contents: read
+  actions: read
+  checks: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checkout:
+    name: "Checkout"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      version: ${{ steps.setup.outputs.version }}
+    concurrency:
+      group: checkout-${{ github.workflow }}-${{ github.ref_name }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+    steps:
+      - name: 📦 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🚂 Setup Dart
+        id: setup
+        timeout-minutes: 5
+        uses: ./.github/actions/setup
+        with:
+          sdk: ${{ github.event.inputs.dart-sdk || 'stable' }}
+          pub-cache: packages
+
+      - name: 🚦 Check code format
+        id: check-format
+        timeout-minutes: 1
+        run: |
+          find lib test example -name "*.dart" ! -name "*.*.dart" -print0 \
+            | xargs -0 dart format --set-exit-if-changed --line-length 80 -o none
+
+      - name: 📈 Check analyzer
+        id: check-analyzer
+        timeout-minutes: 1
+        run: |
+          dart analyze --fatal-infos --fatal-warnings lib/ test/
+          (cd example && dart pub get && dart analyze --fatal-infos --fatal-warnings)
+
+      - name: 🧪 Run unit tests
+        id: run-unit-tests
+        timeout-minutes: 5
+        run: |
+          dart test --coverage=coverage --concurrency=40 test/unit_test.dart
+          dart pub global activate coverage
+          dart pub global run coverage:format_coverage \
+            --lcov \
+            --in=coverage \
+            --out=coverage/lcov.info \
+            --report-on=lib \
+            --check-ignore
+
+      - name: 🧪 Run example
+        id: run-example
+        timeout-minutes: 2
+        working-directory: example
+        run: |
+          dart pub get
+          dart run
+
+      - name: 📊 Upload coverage to Codecov
+        id: upload-coverage
+        timeout-minutes: 2
+        uses: codecov/codecov-action@v5
+        continue-on-error: true
+        with:
+          files: ./coverage/lcov.info
+          flags: unittests
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
