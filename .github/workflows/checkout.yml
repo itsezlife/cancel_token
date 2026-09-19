@@ -65,13 +65,21 @@ jobs:
       - name: 📦 Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🚂 Setup Dart
+      # setup-dart must run at workflow level: nested in a composite action it
+      # resolves dart-analyzer.json against the composite path and fails.
+      - name: 🎯 Setup Dart SDK
+        id: setup-dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: ${{ github.event.inputs.dart-sdk || 'stable' }}
+
+      - name: 🚂 Setup package
         id: setup
         timeout-minutes: 5
         uses: ./.github/actions/setup
         with:
-          sdk: ${{ github.event.inputs.dart-sdk || 'stable' }}
           pub-cache: packages
+          dart-version: ${{ steps.setup-dart.outputs.dart-version }}
 
       - name: 🚦 Check code format
         id: check-format

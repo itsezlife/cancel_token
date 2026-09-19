@@ -1,33 +1,24 @@
 name: "Setup Dart Environment"
-description: Installs the Dart SDK, verifies package version, and runs pub get.
+description: Verifies package version, caches pub, and runs pub get. Requires Dart on PATH.
 
 inputs:
-  sdk:
-    description: "Dart SDK version or channel (e.g. stable, 3.11)"
-    required: false
-    default: stable
   pub-cache:
     description: "Cache key segment for the pub cache"
     required: false
     default: packages
+  dart-version:
+    description: "Resolved Dart SDK version (from setup-dart) for the cache key"
+    required: false
+    default: stable
 
 outputs:
   version:
     description: "The version of the package from pubspec.yaml"
     value: ${{ steps.versions.outputs.version }}
-  dart-version:
-    description: "Resolved Dart SDK version"
-    value: ${{ steps.setup-dart.outputs.dart-version }}
 
 runs:
   using: composite
   steps:
-    - name: 🎯 Setup Dart SDK
-      id: setup-dart
-      uses: dart-lang/setup-dart@v1
-      with:
-        sdk: ${{ inputs.sdk }}
-
     - name: 👀 Verify versions
       id: versions
       shell: bash
@@ -45,7 +36,7 @@ runs:
       with:
         path: |
           ~/.pub-cache
-        key: ${{ runner.os }}-pub-${{ inputs.pub-cache }}-${{ steps.setup-dart.outputs.dart-version }}-${{ hashFiles('pubspec.yaml', 'example/pubspec.yaml') }}
+        key: ${{ runner.os }}-pub-${{ inputs.pub-cache }}-${{ inputs.dart-version }}-${{ hashFiles('pubspec.yaml', 'example/pubspec.yaml') }}
 
     - name: 👷 Install Dependencies
       shell: bash
