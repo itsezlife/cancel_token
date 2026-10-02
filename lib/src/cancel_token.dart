@@ -58,12 +58,15 @@ final class CancelToken implements Cancelable {
       if (token._completer.isCompleted) continue;
       token._reason = reason;
       token._completer.complete();
-      for (final operation in token._tracked) {
+      // Snapshot then clear: each operation's onCancel untracks itself
+      // synchronously, which would mutate the list mid-iteration.
+      final tracked = List.of(token._tracked);
+      token._tracked.clear();
+      for (final operation in tracked) {
         if (!operation.isCanceled) {
           operation.cancel();
         }
       }
-      token._tracked.clear();
       final children = token._children;
       token._children = null;
       if (children != null) pending.addAll(children);
@@ -95,18 +98,30 @@ final class CancelToken implements Cancelable {
 
   /// Tracks [future] so [cancel] also aborts this operation.
   ///
-  /// Completed or cancelled operations are dropped from the tracked set so a
-  /// long-lived token does not retain every past future.
+  /// The operation leaves the tracked set when [future] completes (value or
+  /// error) or when the operation is cancelled — by this token or directly by
+  /// the caller — so a long-lived token does not retain every past future.
+  ///
+  /// A failure of [future] is delivered exactly once, through the returned
+  /// operation's [CancelableOperation.value]: to the caller when awaited, or as
+  /// one unhandled error in the current zone when nobody listens. Tracking adds
+  /// no error report of its own. Once cancelled, a later failure of [future]
+  /// is discarded, as with any [CancelableOperation].
   CancelableOperation<T> track<T>(Future<T> future) {
-    final operation = CancelableOperation<T>.fromFuture(future);
+    late final CancelableOperation<T> operation;
+    void untrack() => _tracked.remove(operation);
+    operation = CancelableOperation<T>.fromFuture(future, onCancel: untrack);
     if (isCancelled) {
       operation.cancel();
       return operation;
     }
     _tracked.add(operation);
-    operation.valueOrCancellation().whenComplete(() {
-      _tracked.remove(operation);
-    });
+    // Cleanup listens to the source, not to the operation: a listener on
+    // `operation.value` would mark its error handled for fire-and-forget
+    // callers, and the derived cleanup Future would carry the same error as a
+    // second unhandled report. The source's error is already delivered through
+    // `operation.value`, so the cleanup chain's own outcome is ignored.
+    future.whenComplete(untrack).ignore();
     return operation;
   }
 }

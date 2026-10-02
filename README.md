@@ -47,7 +47,7 @@ See [`example/bin/cancel_token_example.dart`](example/bin/cancel_token_example.d
 
 ```yaml
 dependencies:
-  cancel_token: ^0.1.1
+  cancel_token: ^0.1.2
 ```
 
 ## Coverage

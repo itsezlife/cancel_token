@@ -128,6 +128,7 @@ void main() {
       token.cancel();
 
       expect(operation.isCanceled, isTrue);
+      expect(token.debugTrackedCount, 0);
       await expectLater(operation.valueOrCancellation(-1), completion(-1));
     });
 
@@ -146,6 +147,52 @@ void main() {
       final token = CancelToken();
       final operation = token.track(Future.value(7));
       expect(await operation.value, 7);
+      expect(token.debugTrackedCount, 0);
+    });
+
+    test('awaited failed track reports its error only to the caller', () async {
+      final token = CancelToken();
+      final zoneErrors = <Object>[];
+      Object? caught;
+
+      // Assertions stay outside the guarded zone: a failure inside it would be
+      // routed to the zone handler and hang the test instead of failing it.
+      await runZonedGuarded(() async {
+        try {
+          await token.track(Future<int>.error(StateError('boom'))).value;
+        } on StateError catch (error) {
+          caught = error;
+        }
+        // Flush so a leaked cleanup error would surface before we assert.
+        await Future<void>.delayed(Duration.zero);
+      }, (error, _) => zoneErrors.add(error));
+
+      expect(caught, isA<StateError>());
+      expect(zoneErrors, isEmpty);
+      expect(token.debugTrackedCount, 0);
+    });
+
+    test('unawaited failed track still reports exactly one zone error',
+        () async {
+      final token = CancelToken();
+      final zoneErrors = <Object>[];
+
+      await runZonedGuarded(() async {
+        token.track(Future<int>.error(StateError('boom')));
+        await Future<void>.delayed(Duration.zero);
+      }, (error, _) => zoneErrors.add(error));
+
+      expect(zoneErrors, [isA<StateError>()]);
+      expect(token.debugTrackedCount, 0);
+    });
+
+    test('track cancelled by the caller is dropped from the tracked set', () {
+      final token = CancelToken();
+      final operation = token.track(Completer<int>().future);
+      expect(token.debugTrackedCount, 1);
+
+      operation.cancel();
+
       expect(token.debugTrackedCount, 0);
     });
   });
